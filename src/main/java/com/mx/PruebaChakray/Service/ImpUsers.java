@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.mx.PruebaChakray.Dao.UsersDao;
 import com.mx.PruebaChakray.Entities.LoginDTO;
-import com.mx.PruebaChakray.Entities.UserResponseDTO;
+import com.mx.PruebaChakray.Entities.UserDTO;
 import com.mx.PruebaChakray.Entities.Users;
 import com.mx.PruebaChakray.core.AESEcnryption;
 
@@ -60,9 +60,13 @@ public class ImpUsers implements IMethods {
 			old.setPassword(encrypt);
 		}
 		if (!user.getPhone().isEmpty()) {
-
+			if (user.getPhone().matches(phonePAttern))
+				old.setPhone(user.getPhone());
+			else throw new Exception("Numero de telefono invalido");
 		}
-
+		if (!user.getEmail().isEmpty()) {
+			old.setEmail(user.getEmail());
+		}
 		dao.save(old);
 	}
 
@@ -80,11 +84,11 @@ public class ImpUsers implements IMethods {
 
 	@Override
 	public List<Object> list() {
-		List<UserResponseDTO> users = (List<UserResponseDTO>) dao.findAll().stream().map(x -> x.toDTO()).toList();
+		List<UserDTO> users = (List<UserDTO>) dao.findAll().stream().map(x -> x.toDTO()).toList();
 		return users.stream().collect(Collectors.toList());
 	}
 
-	public List<UserResponseDTO> listOrderBy(String orderBy, String filterBy, String filterType, String filterValue)
+	public List<UserDTO> listOrderBy(String orderBy, String filterBy, String filterType, String filterValue)
 			throws Exception {
 		List<Users> orderedList;
 		if (orderBy == null || orderBy.isEmpty()) {

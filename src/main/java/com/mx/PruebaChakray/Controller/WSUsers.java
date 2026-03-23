@@ -18,12 +18,24 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.mx.PruebaChakray.Entities.LoginDTO;
+import com.mx.PruebaChakray.Entities.UserDTO;
 import com.mx.PruebaChakray.Entities.Users;
 import com.mx.PruebaChakray.Service.ImpUsers;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.ExampleObject;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping(path = "api/users")
 @CrossOrigin("*")
+@Tag(name = "Usuarios", description = "API de administracion de usuarios")
 public class WSUsers {
 	@Autowired
 	ImpUsers imp;
@@ -39,7 +51,13 @@ public class WSUsers {
 	 */
 
 	@GetMapping
-	ResponseEntity<?> find(@RequestParam("sortedBy") Optional<String> sortedBy, @RequestParam("filter") String filter) {
+	@Operation(summary = "Buscar usuarios", description = "Busca usuarios filtrados y ordenados")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Regresa una lista de usuarios con el filtro proporcionado", content = @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = UserDTO.class)))),
+			@ApiResponse(responseCode = "400", description = "campo de ordenamiento o filtro invalido o filtro no proporcionado") })
+	ResponseEntity<?> find(
+			@Parameter(description = "Campo de ordenamiento", required = false) @RequestParam("sortedBy") Optional<String> sortedBy,
+			@Parameter(description = "Filtro de resultados", required = true) @RequestParam("filter") String filter) {
 		try {
 			String message = "";
 			String[] filterParts = filter.split(" ");
@@ -69,8 +87,13 @@ public class WSUsers {
 		}
 	}
 
+	@Operation(summary = "Agregar usuario", description = "Agregar un usuario nuevo")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Se agrego el usuario correctamente", content = @Content(mediaType = "application/json", schema = @Schema(implementation = UserDTO.class))),
+			@ApiResponse(responseCode = "400", description = "Identificador invalido o duplicado o numero de telefono invalido") })
 	@PostMapping
-	ResponseEntity<?> create(@RequestBody Users body) {
+	ResponseEntity<?> create(
+			@Parameter(description = "Cuerpo del nuevo usuario a agregar", required = true) @RequestBody Users body) {
 		try {
 			System.out.println("body: " + body);
 			return ResponseEntity.ok(imp.create(body));
@@ -78,34 +101,49 @@ public class WSUsers {
 			return ResponseEntity.badRequest().body(e.getLocalizedMessage());
 		}
 	}
-	
+
 	@PatchMapping("/{id}")
-	ResponseEntity<?> update(@PathVariable String id, @RequestBody Users body){
+	@Operation(summary = "Editar usuario", description = "Editar un usuario registrado anteriormente")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Usuario editado exitosamente"),
+			@ApiResponse(responseCode = "400", description = "No existe un usuario con el identificador o numero de telefono invalido") })
+	ResponseEntity<?> update(
+			@Parameter(description = "Identificador del usuario a actualizar", required = true) @PathVariable String id,
+			@Parameter(description = "Cuerpo del usuario con los campos a remplazar", required = true) @RequestBody Users body) {
 		try {
 			imp.update(id, body);
 			return ResponseEntity.ok("Actualizacion exitosa");
-		}catch (Exception ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 			return ResponseEntity.badRequest().body(ex.getLocalizedMessage());
 		}
 	}
-	
+
 	@DeleteMapping("/{id}")
-	ResponseEntity<?> delete(@PathVariable String id){
+	@Operation(summary = "Eliminar usuario", description = "Elimina un registro de usuario")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Registro de usuario eliminado con exito"),
+			@ApiResponse(responseCode = "400", description = "No existe un usuario con ese identificador") })
+	ResponseEntity<?> delete(
+			@Parameter(description = "Identificador del usuario a eliminar", required = true) @PathVariable String id) {
 		try {
 			imp.delete(id);
 			return ResponseEntity.ok("Eliminacion exitosa");
-		}catch (Exception ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 			return ResponseEntity.badRequest().body(ex.getLocalizedMessage());
 		}
 	}
-	
+
 	@PostMapping("/login")
-	ResponseEntity<?> login(@RequestBody LoginDTO body){
+	@Operation(summary = "Inicio de sesion", description = "Realizar intento de iniciar sesion")
+	@ApiResponses(value = {
+			@ApiResponse(responseCode = "200", description = "Se realizo el intento de inicio de sesion", content = @Content(mediaType = "application/json", examples = {
+					@ExampleObject(value = "true"), @ExampleObject(value = "false") })),
+			@ApiResponse(responseCode = "400", description = "No existe usuario con el identificador") })
+	ResponseEntity<?> login(
+			@Parameter(description = "Nombre de usuario y contraseña", required = true) @RequestBody LoginDTO body) {
 		try {
 			return ResponseEntity.ok(imp.login(body));
-		}catch (Exception ex) {
+		} catch (Exception ex) {
 			ex.printStackTrace();
 			return ResponseEntity.badRequest().body(ex.getLocalizedMessage());
 		}

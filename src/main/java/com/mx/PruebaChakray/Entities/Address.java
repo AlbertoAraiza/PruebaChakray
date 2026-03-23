@@ -1,5 +1,6 @@
 package com.mx.PruebaChakray.Entities;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -17,6 +18,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@Hidden
 public class Address {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
