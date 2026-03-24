@@ -1,0 +1,11 @@
+services:
+  prueba-chakray:
+    build: .
+    container_name: prueba-chakray
+    ports:
+      - "9006:9006"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:oracle:thin:@host.docker.internal:1521/XE
+      SPRING_DATASOURCE_USERNAME: System
+      SPRING_DATASOURCE_PASSWORD: 12345
+    depends_on: []

@@ -31,7 +31,7 @@ public class AESEcnryption {
 		IvParameterSpec ivSpec = new IvParameterSpec(iv);
 
 		cipher.init(Cipher.ENCRYPT_MODE, keySpec, ivSpec);
-		System.out.println("plain text: " + plainText);
+		//System.out.println("plain text: " + plainText);
 		byte[] encrypted = cipher.doFinal(plainText.getBytes(ENCODING));
 		byte[] encrypedData = new byte[iv.length + encrypted.length];
 		System.arraycopy(iv, 0, encrypedData, 0, iv.length);

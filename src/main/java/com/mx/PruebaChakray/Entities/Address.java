@@ -1,5 +1,7 @@
 package com.mx.PruebaChakray.Entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import io.swagger.v3.oas.annotations.Hidden;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,6 +33,7 @@ public class Address {
 
 	@ManyToOne
 	@JoinColumn(name = "USER_ID")
+	@JsonIgnore
 	private Users user;
 
 	public AddressDTO toDTO() {

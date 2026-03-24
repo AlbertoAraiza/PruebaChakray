@@ -33,11 +33,11 @@ public class ImpUsers implements IMethods {
 		user.setPhone(user.getPhone().replaceAll("\\s+", ""));
 		if (found != null) {
 			throw new Exception("Tax id registrado con anterioridad");
-		}else if (!user.getTaxId().matches(rfcPattern)) {
+		} else if (!user.getTaxId().matches(rfcPattern)) {
 			throw new Exception("Tax id invalido");
-		}else if(!user.getPhone().matches(phonePAttern)) {
-			throw new Exception("numero de telefono invalido");
-		}else {
+		} else if (!user.getPhone().matches(phonePAttern)) {
+			throw new Exception("Numero de telefono invalido");
+		} else {
 			user.setId(UUID.randomUUID().toString());
 			String encrypt = AESEcnryption.encrypt(user.getPassword(), "Password2");
 			user.setPassword(encrypt);
@@ -45,7 +45,7 @@ public class ImpUsers implements IMethods {
 			user.setCreatedAt(now);
 			Users newUser = dao.save(user);
 			return newUser.toDTO();
-		} 
+		}
 	}
 
 	@Override
@@ -62,7 +62,8 @@ public class ImpUsers implements IMethods {
 		if (!user.getPhone().isEmpty()) {
 			if (user.getPhone().matches(phonePAttern))
 				old.setPhone(user.getPhone());
-			else throw new Exception("Numero de telefono invalido");
+			else
+				throw new Exception("Numero de telefono invalido");
 		}
 		if (!user.getEmail().isEmpty()) {
 			old.setEmail(user.getEmail());
@@ -134,10 +135,11 @@ public class ImpUsers implements IMethods {
 		}
 		return false;
 	}
-	
+
 	public boolean login(LoginDTO login) throws Exception {
 		Users user = dao.findByTaxId(login.getUsername()).orElse(null);
-		if (user == null) throw new Exception("Invalid tax id");
+		if (user == null)
+			throw new Exception("Invalid tax id");
 		String unencryptedPassword = AESEcnryption.decrypt(user.getPassword(), "Password2");
 		return login.getPassword().equals(unencryptedPassword);
 	}
